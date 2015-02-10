@@ -51,6 +51,7 @@ $(function() {
     var STICK_INC = 3;
     var PERFECT_WIDTH = 6;
     var UNLOCK_COUNT = 5;
+    var EXPAND_WIDTH = 20;
     var BOX_LEFT_MIN = BOX_BASE_WIDTH + 30;
     var BOX_LEFT_MAX = GAME_WIDTH - BOX_BASE_WIDTH;
     var BOX_WIDTH_MIN = Math.round(15 * WIDTH_RATIO); //
@@ -275,19 +276,20 @@ $(function() {
     this.reset = function() {
       this.score = 0;
       this.count = 0;
+      this.isExpand = false;
       this.best = localStorage.getItem('best') || 0;
       this.$title.text(TITLE_DEFAULT);
       this.$heroContainer = this.$hero.parent();
       this.$game
         .removeClass('bounce bg1 bg2 bg3 bg4 bg5 bg6')
-        .addClass('bg' + this._getRandom(1, 6));
+        .addClass('bg' + this._random(1, 6));
       this.$gametitle.removeClass('hinge');
       this.$livescore.hide();
       this.$gameover.hide();
       this.$welcome.hide();
       this.updateScore();
 
-      $('.box, .stick').remove();
+      $('.box, .stick, .expand').remove();
       this.BOX1 = { left: 0, width: BOX_BASE_WIDTH };
       this.$box1 = $('<div />').addClass('box init').css({
         'height': BOX_HEIGHT + 'px',
@@ -374,6 +376,7 @@ $(function() {
     };
 
     this.begin = function() {
+      var self = this;
       this._activeStickHeight = 0;
       this._validStickMin = this.BOX2.left - BOX_BASE_WIDTH;
       this._validStickMax = this._validStickMin + this.BOX2.width;
@@ -387,7 +390,13 @@ $(function() {
         });
       this.$game.append(this.$activeStick);
 
-      var self = this;
+      if (this._random(1, 10) % 2) {
+        console.log('expand');
+        setTimeout(function () {
+          self.useExpand();
+        }, 3000);
+      }
+
       PRESS_STARTED = false;
       IS_TOUCHING = false;
       (function loop() {
@@ -424,10 +433,13 @@ $(function() {
     };
 
     this.heroWalk = function() {
+      var duration, self = this;
       this.dx = this.BOX2.left + this.BOX2.width - BOX_BASE_WIDTH;
 
       if (this._activeStickHeight > this._validStickMin && this._activeStickHeight < this._validStickMax) {
         this.nextAfterAnimation(this.$hero, STATES.SHIFTING);
+
+        duration = this.dx / 225;
 
         this._perfectMin = this._validStickMin + (this.BOX2.width - PERFECT_WIDTH) / 2;
         this._perfectMax = this._perfectMin + PERFECT_WIDTH;
@@ -456,15 +468,15 @@ $(function() {
         this.$hero.css({
           'transform': 'translate3d(' + (this.BOX2.left + this.BOX2.width - HERO_WIDTH - GAP - STICK_WIDTH) + 'px, 0, 0)',
           '-webkit-transform': 'translate3d(' + (this.BOX2.left + this.BOX2.width - HERO_WIDTH - GAP - STICK_WIDTH) + 'px, 0, 0)',
-          'transition-duration': this.dx / 225 + 's',
-          '-webkit-transition-duration': this.dx / 225 + 's',
+          'transition-duration': duration + 's',
+          '-webkit-transition-duration': duration + 's',
           'transition-timing-function': 'linear',
           '-webkit-transition-timing-function': 'linear'
         });
       } else {
         this.nextAfterAnimation(this.$hero, STATES.DYING);
 
-        var duration = (GAP + HERO_WIDTH + this._activeStickHeight) / 225;
+        duration = (GAP + HERO_WIDTH + this._activeStickHeight) / 225;
         duration = duration > 1 ? 1 : duration;
         this.$hero.css({
           'transform': 'translate3d(' + (BOX_BASE_WIDTH + this._activeStickHeight) + 'px, 0, 0)',
@@ -482,6 +494,15 @@ $(function() {
         'transition-timing-function': '',
         '-webkit-transition-timing-function': ''
       });
+      if (this.isExpand) {
+        setTimeout(function () {
+          self.$expand.addClass('out').css({
+            'transform': 'translate3d(' + self.expandX + 'px, -15px, 0) scale(1.2)',
+            '-webkit-transform': 'translate3d(' + self.expandX + 'px, -15px, 0) scale(1.2)'
+          });
+          // this.addExpand();
+        }, duration);
+      }
     };
 
     this.shifting = function() {
@@ -522,6 +543,18 @@ $(function() {
         'width': this.BOX3.width + 'px',
         'right': -this.BOX3.width + 'px'
       });
+
+      this.isExpand = this._isExpand();
+      if (this.isExpand) {
+        this.expandX = (this.BOX3.left + BOX_BASE_WIDTH - EXPAND_WIDTH) / 2;
+        this.$expand = $('<img />').addClass('expand').attr('src', 'images/expand.png')
+          .css({
+            'bottom': BOX_HEIGHT + 10 + 'px',
+            'transform': 'translate3d(' + this.expandX + 'px, 0, 0)',
+            '-webkit-transform': 'translate3d(' + this.expandX + 'px, 0, 0)'
+          });
+        this.$game.append(this.$expand);
+      }
       this.$game.append(this.$box3);
 
       setTimeout(function() {
@@ -529,6 +562,9 @@ $(function() {
           'transform': 'translate3d(' + -(GAME_WIDTH - self.BOX3.left) + 'px, 0, 0)',
           '-webkit-transform': 'translate3d(' + -(GAME_WIDTH - self.BOX3.left) + 'px, 0, 0)'
         });
+        if (self.isExpand) {
+          self.$expand.addClass('in');
+        }
       }, 100);
 
       this.$activeStick.css({
@@ -596,14 +632,27 @@ $(function() {
       this.$best.text(this.best);
     };
 
+    this.useExpand = function () {
+      this.BOX2.width = this.BOX2.width * 2;
+      this.$box2.css({
+        'width': this.BOX2.width + 'px'
+        // 'right': -this.BOX2.width + 'px'
+      });
+    };
+
+    this._isExpand = function () {
+      return this._random(1, 10)  % 2;
+      // return this._random(1, 10) === 5; // default 10% possibility
+    };
+
     this._createBox = function() {
       return {
-        left: this._getRandom(BOX_LEFT_MIN, BOX_LEFT_MAX),
-        width: this._getRandom(BOX_WIDTH_MIN, BOX_WIDTH_MAX)
+        left: this._random(BOX_LEFT_MIN, BOX_LEFT_MAX),
+        width: this._random(BOX_WIDTH_MIN, BOX_WIDTH_MAX)
       };
     };
 
-    this._getRandom = function(min, max) {
+    this._random = function(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
