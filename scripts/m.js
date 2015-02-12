@@ -62,6 +62,7 @@ $(function() {
     var IS_WECHAT = !!navigator.userAgent.match(/MicroMessenger/);
     // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/touchevents.js#L40
     var IS_TOUCH = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch);
+    var IS_ANDROID = navigator.userAgent.toLowerCase().indexOf('android') > -1;
     var CLICK_EVENT = IS_TOUCH ? 'touchstart' : 'click';
     var HERO_WIDTH; //
     var HERO_HEIGHT; //
@@ -84,7 +85,7 @@ $(function() {
       DEAD: 8
     };
     var LAST_STATE = 8;
-    var TITLES = ['玫瑰修行者', '玫瑰小侠', '玫瑰大侠', '玫瑰青铜侠', '玫瑰白银侠', '玫瑰黄金侠'];
+    var TITLES = ['玫瑰修行者', '玫瑰小侠', '玫瑰大侠', '玫瑰青铜侠', '玫瑰白银侠', '玫瑰黄金侠', '玫瑰钻石侠'];
 
     this.init = function() {
       this.checkVersion();
@@ -397,13 +398,15 @@ $(function() {
         }
         if (IS_TOUCHING) {
           if (!PRESS_STARTED) {
-            self.$heroContainer.addClass('shake');
+            if (!IS_ANDROID) {
+              self.$heroContainer.addClass('shake');
+            }
             self.$instruction.removeClass('in');
             PRESS_STARTED = true;
           }
           self._activeStickHeight += STICK_INC;
-          // self.$activeStick[0].style.height = self._activeStickHeight + 'px';
-          self.$activeStick.css({height: self._activeStickHeight + 'px'});
+          self.$activeStick[0].style.height = self._activeStickHeight + 'px';
+          // self.$activeStick.css({height: self._activeStickHeight + 'px'});
         }
         if (!IS_TOUCHING && PRESS_STARTED) {
           self.next();
@@ -553,7 +556,7 @@ $(function() {
       this.$activeStick.addClass('died');
 
       if (IS_WECHAT) {
-        this.$title.text(TITLE_DEFAULT + ':太厉害了，我一不小心就前进了' + this.score + '步。连续5次+1解锁隐藏英雄哦！！');
+        this.$title.text(TITLE_DEFAULT + ': 我一不小心就赢得了' + this.score + '朵玫瑰，江湖人称' + this.getTitle(this.score) + '哦！你呢？');
       }
     };
 
@@ -606,6 +609,24 @@ $(function() {
 
     this._getRandom = function(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+
+    this.getTitle = function (score) {
+      if (score <= 5) {
+        return TITLES[0];
+      } else if (score <= 15) {
+        return TITLES[1];
+      } else if (score <= 25) {
+        return TITLES[2];
+      } else if (score <= 35) {
+        return TITLES[3];
+      } else if (score <= 50) {
+        return TITLES[4];
+      } else if (score <= 75) {
+        return TITLES[5];
+      } else {
+        return TITLES[6];
+      }
     };
 
     this.init();
