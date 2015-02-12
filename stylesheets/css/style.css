@@ -195,7 +195,7 @@
 .heropick.in { -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); opacity: 1; }
 .heropick .title { padding: 12px; }
 .heropick .total { float: right; }
-.heropick img { width: 18px; float: right; margin-left: 8px; }
+.heropick img { width: 18px; float: right; margin-left: 6px; }
 .heropick .heros { padding: 10px 20px; }
 .heropick .wrapper { cursor: pointer; padding: 22px 10px; display: inline-block; position: relative; width: 80px; height: 60px; box-sizing: border-box; border-radius: 10px; }
 .heropick .wrapper.combo { width: 100%; }
@@ -204,7 +204,7 @@
 .heropick .wrapper.myth.locked .price { width: 100%; text-align: center; font-size: 12px; margin-left: 0; -webkit-transform: translate3d(-10px, -5px, 0); transform: translate3d(-10px, -5px, 0); }
 .heropick .wrapper.myth img { float: none; top: 5px; position: relative; }
 .heropick .wrapper.locked { background-color: #ffff66; }
-.heropick .wrapper.locked .price { position: absolute; display: block; width: 65px; font-size: 14px; }
+.heropick .wrapper.locked .price { position: absolute; display: block; width: 60px; font-size: 14px; }
 .heropick .wrapper.locked .hero-c { visibility: hidden; }
 .heropick .wrapper .price { display: none; }
 .heropick .wrapper .hero-c { display: block; position: absolute; left: 50%; top: 50%; -webkit-transform: translate3d(-50%, -50%, 0); transform: translate3d(-50%, -50%, 0); }

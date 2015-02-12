@@ -84,6 +84,7 @@ $(function() {
       DEAD: 8
     };
     var LAST_STATE = 8;
+    var TITLES = ['玫瑰修行者', '玫瑰小侠', '玫瑰大侠', '玫瑰青铜侠', '玫瑰白银侠', '玫瑰黄金侠'];
 
     this.init = function() {
       this.checkVersion();
