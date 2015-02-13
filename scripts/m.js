@@ -556,7 +556,7 @@ $(function() {
       this.$activeStick.addClass('died');
 
       if (IS_WECHAT) {
-        this.$title.text(TITLE_DEFAULT + ': 我一不小心就赢得了' + this.score + '朵玫瑰，江湖人称' + this.getTitle(this.score) + '哦！你呢？');
+        this.$title.text(TITLE_DEFAULT + ': 我赢得了' + this.score + '朵玫瑰，江湖人称' + this.getTitle(this.score) + '哦！你呢？');
       }
     };
 
