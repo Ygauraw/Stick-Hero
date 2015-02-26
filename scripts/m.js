@@ -35,7 +35,6 @@ $(function() {
   function Game(options) {
 
     this.options = options || {};
-    var VERSION = '1.0.3';
     var GAME_DEFAULT_WIDTH = 320;
     var GAME_DEFAULT_HEIGHT = 480;
     var GAME_WIDTH = this.options.width || GAME_DEFAULT_WIDTH;
@@ -56,10 +55,8 @@ $(function() {
     var BOX_WIDTH_MIN = Math.round(15 * WIDTH_RATIO); //
     var BOX_WIDTH_MAX = Math.round(69 * WIDTH_RATIO); //
     var ANIMATION_END_EVENTS = 'webkitTransitionEnd transitionend animationend webkitAnimationEnd';
-    var TITLE_DEFAULT = '';
     var IS_TOUCHING = false;
     var PRESS_STARTED = false;
-    var IS_WECHAT = !!navigator.userAgent.match(/MicroMessenger/);
     // https://github.com/Modernizr/Modernizr/blob/master/feature-detects/touchevents.js#L40
     var IS_TOUCH = !!(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch);
     var CLICK_EVENT = IS_TOUCH ? 'touchstart' : 'click';
@@ -86,23 +83,12 @@ $(function() {
     var LAST_STATE = 8;
 
     this.init = function() {
-      this.checkVersion();
       this.initVars();
       this.bindEvents();
       this.reset();
     };
 
-    this.checkVersion = function () {
-      var version = localStorage.getItem('version') || '0.0.0';
-      localStorage.setItem('version', VERSION);
-      this.upgrade(VERSION, version);
-    };
-
-    this.upgrade = function () { };
-
     this.initVars = function() {
-      this.$title = $('title');
-      TITLE_DEFAULT = this.$title.text();
       this.$copyright = $('.copyright');
       this.$game = $('#game').css({
         width: GAME_WIDTH + 'px',
@@ -113,7 +99,6 @@ $(function() {
       this.$gameover = $('.game-over');
       this.$welcome = $('.welcome');
       this.$heropick = $('.heropick');
-      this.$share = $('.share');
       this.$livescore = $('.live-score');
       this.$watermelon = $('.watermelon');
       this.$instruction = $('.instruction');
@@ -221,14 +206,6 @@ $(function() {
         self.reset();
         self.next(STATES.WELCOME);
       });
-      $('.btn-share').on(CLICK_EVENT, function(event) {
-        self.$share.show();
-        event.stopPropagation();
-        $(document).on(CLICK_EVENT, '.overlay', function() {
-          $(document).off(CLICK_EVENT, '.overlay');
-          self.$share.hide();
-        });
-      });
       $('.btn-hero').on(CLICK_EVENT, function(event) {
         self.$heropick.toggleClass('in');
         event.stopPropagation();
@@ -272,7 +249,6 @@ $(function() {
       this.gameRound ++;
       this.adf = false;
       this.best = localStorage.getItem('best') || 0;
-      this.$title.text(TITLE_DEFAULT);
       this.$heroContainer = this.$hero.parent();
       this.$game
         .removeClass('bounce bg1 bg2 bg3 bg4 bg5 bg6')
@@ -555,10 +531,6 @@ $(function() {
       });
       this.$feet.removeClass('walk');
       this.$activeStick.addClass('died');
-
-      if (IS_WECHAT) {
-        this.$title.text(TITLE_DEFAULT + ':太厉害了，我一不小心就前进了' + this.score + '步。连续5次+1解锁隐藏英雄哦！！');
-      }
     };
 
     this.update = function() {
